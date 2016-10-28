@@ -35,10 +35,21 @@ public:
         info.right_eol_value    = m_eol->readRight();
         info.ver_maj            = KNITTY_KITTY_VERSION_MAJ;
         info.ver_min            = KNITTY_KITTY_VERSION_MIN;
-        
+        /*
 //        Serial.write((byte*)&info, sizeof(kk_state_pack));
         Serial.write("pos: ");
-        Serial.write(info.carriage_position);
+        Serial.print(info.left_eol_value);
+        Serial.write(",");
+        Serial.print(info.right_eol_value);
+        Serial.write(",");
+        Serial.print(info.carriage_position);
+        //Serial.write("left: ");
+        //Serial.print(info.left_eol_value);
+        Serial.write("\n");
+        //Serial.write("pos: ");
+        //Serial.print(info.right_eol_value);
+        //Serial.write("\n");*/
+        
     }
 
     bool recvSync(byte *state, byte *rbuffer, byte *lbuffer) {

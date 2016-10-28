@@ -26,28 +26,28 @@
 #define ENDLINE_L A1
 #define ENDLINE_R A0
 
-#define SOL00_PIN 22
-#define SOL01_PIN 24
-#define SOL02_PIN 26
-#define SOL03_PIN 28
-#define SOL04_PIN 30
-#define SOL05_PIN 32
-#define SOL06_PIN 34
-#define SOL07_PIN 36
-#define SOL08_PIN 37
-#define SOL09_PIN 35
-#define SOL10_PIN 33
-#define SOL11_PIN 31
-#define SOL12_PIN 29
-#define SOL13_PIN 27
-#define SOL14_PIN 25
-#define SOL15_PIN 23
+#define SOL00_PIN 36
+#define SOL01_PIN 34
+#define SOL02_PIN 32
+#define SOL03_PIN 30
+#define SOL04_PIN 28
+#define SOL05_PIN 26
+#define SOL06_PIN 24
+#define SOL07_PIN 22
+#define SOL08_PIN 38
+#define SOL09_PIN 40
+#define SOL10_PIN 42
+#define SOL11_PIN 44
+#define SOL12_PIN 46
+#define SOL13_PIN 48
+#define SOL14_PIN 50
+#define SOL15_PIN 52
 
 // Default filter values
 #define FILTER_VALUE_LEFT_MIN     32
 #define FILTER_VALUE_RIGHT_MIN    32
-#define FILTER_VALUE_LEFT_MAX     700
-#define FILTER_VALUE_RIGHT_MAX    700
+#define FILTER_VALUE_LEFT_MAX     730
+#define FILTER_VALUE_RIGHT_MAX    730
 
 
 

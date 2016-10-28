@@ -43,7 +43,7 @@ enum kk_opcode : byte {
 
 struct kk_state_pack {
   uint32_t header_sig;
-  uint16_t carriage_position;
+  int16_t carriage_position;
   uint8_t carriage_type;
   uint8_t carriage_direction;
   uint8_t belt_shift;

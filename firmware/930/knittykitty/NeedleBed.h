@@ -33,9 +33,10 @@ public:
      * from the encoder. This basically actuates the 
      */
     void updateBed() {
-        unsigned int cpos = m_enc->getCarriagePosition();
+        int cpos = m_enc->getCarriagePosition();
         carriage_t carriage = m_enc->getCarriageType();
         carriage_direction_t dit = m_enc->getCarriageDirection();
+
         int start_pos = cpos, end_pos = cpos;
 
         // Translate the carriage position into a needle position
@@ -43,9 +44,12 @@ public:
         // will actuate needles at different offsets.
         switch(carriage) {
             default:
+                start_pos = cpos + 16, end_pos = cpos + 16;
+                start_pos -= LOOKAHEAD;
+                end_pos += LOOKAHEAD;
+
                 break;
         }
-
         // Bound the window to a resonable area
         if(start_pos < 0) start_pos = 0;
         if(start_pos > NEEDLEBED_COUNT) start_pos = NEEDLEBED_COUNT;
@@ -55,10 +59,13 @@ public:
         // Activate solenoids
         m_sol->clearSolenoids();
         
-        for(unsigned int i = start_pos; i < end_pos; i++)
+        for(unsigned int i = start_pos; i < end_pos+1; i++){
+            Serial.print(i); Serial.print(":"), Serial.print(m_currentrow[i]), Serial.print("\n");
             m_sol->setState(i%NUM_SOLENOIDS, m_currentrow[i]);   
+        }
         
         m_sol->writeSolenoids();     
+        Serial.print("Updaing");
     }
 
     /*
@@ -66,6 +73,7 @@ public:
      */
     void updateRowData(byte *bed, int start, int end) {
         for(unsigned int i = 0; i < NEEDLEBED_COUNT; i++) {
+            Serial.print(i); Serial.print(":"), Serial.print(m_currentrow[i]), Serial.print("\n");
             m_currentrow[i] = bed[i];
         }
     }

@@ -50,7 +50,7 @@ public:
     /*
      * 
      */
-    unsigned int getCarriagePosition() {
+    int getCarriagePosition() {
         return m_position;
     }
 
@@ -88,10 +88,10 @@ private:
     void encoderAFalling() { // handle moving left
         uint16_t eol_value = 0;
         
-        if(m_direction == CARRIAGE_RIGHT) // Right is handled on rising edge
+        if(m_direction == CARRIAGE_LEFT) // Right is handled on rising edge
             return;
 
-        if(m_position  < NEEDLEBED_COUNT) m_position++;
+        if(m_position  > 0 ) m_position--;
 
         // 
         eol_value = m_eol->readRight();
@@ -116,11 +116,14 @@ private:
         uint16_t eol_value = 0;
       
         // Check the service manual for this.
-        m_direction = digitalRead(ENCODER_B) ? CARRIAGE_RIGHT : CARRIAGE_LEFT;
-        if(m_direction == CARRIAGE_LEFT) // Moving left should be handled on the falling edge
+        m_direction = digitalRead(ENCODER_B) ? CARRIAGE_LEFT : CARRIAGE_RIGHT;
+        
+        if(m_direction == CARRIAGE_RIGHT) // Moving left should be handled on the falling edge
+        {
             return;
+        }
 
-        if(m_position > 0) m_position--;
+        if(m_position < NEEDLEBED_COUNT) m_position++;
         
         // 
         eol_value = m_eol->readLeft();

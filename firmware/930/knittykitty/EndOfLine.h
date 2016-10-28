@@ -17,8 +17,8 @@ class EndOfLine {
 public:
     EndOfLine() : m_bCalibrate(false), 
                   m_iLeftMin(FILTER_VALUE_LEFT_MIN), 
-                  m_iLeftMax(FILTER_VALUE_RIGHT_MAX), 
-                  m_iRightMin(FILTER_VALUE_LEFT_MIN), 
+                  m_iLeftMax(FILTER_VALUE_LEFT_MAX), 
+                  m_iRightMin(FILTER_VALUE_RIGHT_MIN), 
                   m_iRightMax(FILTER_VALUE_RIGHT_MAX) {
     }
     ~EndOfLine() { }
