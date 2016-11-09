@@ -94,6 +94,7 @@ void loop() {
             } else if(carriage_dir !=  g_Encoders->getCarriageDirection()) {
                 carriage_dir = g_Encoders->getCarriageDirection();
                 test_sol_1_pos = (test_sol_1_pos + 1) % NUM_SOLENOIDS;
+                Serial.println(test_sol_1_pos);
                 g_Solenoids->writeSolenoids();
             }
             g_knitState = KK_SEND_SYNC;
