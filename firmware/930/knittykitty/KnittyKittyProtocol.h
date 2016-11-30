@@ -35,9 +35,9 @@ public:
         info.right_eol_value    = m_eol->readRight();
         info.ver_maj            = KNITTY_KITTY_VERSION_MAJ;
         info.ver_min            = KNITTY_KITTY_VERSION_MIN;
-        /*
-//        Serial.write((byte*)&info, sizeof(kk_state_pack));
-        Serial.write("pos: ");
+        
+        Serial.write((byte*)&info, sizeof(kk_state_pack));
+/*        Serial.write("pos: ");
         Serial.print(info.left_eol_value);
         Serial.write(",");
         Serial.print(info.right_eol_value);
@@ -78,7 +78,7 @@ public:
                 break;
            
             case KK_OP_RESET:
-                *state = KK_IDLE;
+                *state = KK_INIT;
                 break;
                 
             case KK_OP_NOP:

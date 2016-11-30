@@ -46,8 +46,13 @@ void setup() {
 
 void encoderChangeIsr() {
     if(g_Encoders != NULL) g_Encoders->updateState();
-    //if(g_needleBed != NULL) g_needleBed->updateBed();
+          if(g_needleBed != NULL) {
+            g_Solenoids->clearSolenoids();
+            g_needleBed->updateBed();
+          }
     switch(g_knitState) {
+        case KK_TEST_SOL2: 
+          if(g_needleBed != NULL) g_needleBed->updateBed();
         default: 
             break;
     }
@@ -59,11 +64,15 @@ void encoderChangeIsr() {
 void loop() {
     switch(g_knitState) {
         case KK_IDLE:
-            ret_state = KK_TEST_SOL1;
+            ret_state = KK_IDLE;
+//            ret_state = KK_TEST_SOL2;
             g_knitState = KK_SEND_SYNC;
             carriage_dir = g_Encoders->getCarriageDirection();
             test_sol_1_pos = 0;
-            test_sol_2_pos = 0;
+            test_sol_2_pos = 99;
+            
+            g_Solenoids->clearSolenoids();
+            g_needleBed->updateBed();
         break;
         
         case KK_SEND_SYNC:
@@ -104,15 +113,28 @@ void loop() {
             ret_state = KK_TEST_SOL2;
 
             for(int i = 0; i < NEEDLEBED_COUNT; i++) {
-                lbuffer[i] = i % 2 == 1;
+                lbuffer[i] = false;
             }
             lbuffer[test_sol_2_pos] = true;
+            lbuffer[test_sol_2_pos+2] = true;
+            lbuffer[test_sol_2_pos+4] = true;
+            lbuffer[test_sol_2_pos+6] = true;
+            lbuffer[test_sol_2_pos+8] = true;
+            lbuffer[test_sol_2_pos+10] = true;
+            lbuffer[test_sol_2_pos+12] = true;
+            lbuffer[test_sol_2_pos+14] = true;
+            lbuffer[test_sol_2_pos+16] = true;
+            lbuffer[test_sol_2_pos+18] = true;
+            g_needleBed->updateRowData(lbuffer, 
+                                           carriage_dir == CARRIAGE_LEFT ? 0 : NEEDLEBED_COUNT, 
+                                           carriage_dir == CARRIAGE_LEFT ? NEEDLEBED_COUNT : 0);
             
+            g_Solenoids->clearSolenoids();
+            g_needleBed->updateBed();
             if(carriage_dir == UNKNOWN_DIRECTION && g_Encoders->getCarriageDirection() != UNKNOWN_DIRECTION) {
                 carriage_dir = g_Encoders->getCarriageDirection();
                 
             } else if(carriage_dir !=  g_Encoders->getCarriageDirection()) {
-                Serial.print("Updating row data");
                 carriage_dir = g_Encoders->getCarriageDirection();
                 g_needleBed->updateRowData(lbuffer, 
                                            carriage_dir == CARRIAGE_LEFT ? 0 : NEEDLEBED_COUNT, 
@@ -126,7 +148,7 @@ void loop() {
         case KK_INIT:
             g_knitState = KK_IDLE;
             Serial.print("Init, clearing bed...");
-            //g_needleBed->clearBed();
+            g_needleBed->clearBed();
             break;
         default:
             g_knitState = KK_INIT;

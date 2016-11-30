@@ -35,37 +35,64 @@ public:
     void updateBed() {
         int cpos = m_enc->getCarriagePosition();
         carriage_t carriage = m_enc->getCarriageType();
-        carriage_direction_t dit = m_enc->getCarriageDirection();
+        carriage_direction_t dir = m_enc->getCarriageDirection();
+        beltshift_t bs = m_enc->getBeltShift();
 
-        int start_pos = cpos, end_pos = cpos;
-
-        // Translate the carriage position into a needle position
-        // Take a look at the service manual, different carriages
-        // will actuate needles at different offsets.
-        switch(carriage) {
-            default:
-                start_pos = cpos + 16, end_pos = cpos + 16;
-                start_pos -= LOOKAHEAD;
-                end_pos += LOOKAHEAD;
-
-                break;
+        if(bs == REGULAR) {
+          
+            int solenoid = 0;
+            int shift = 0;
+            
+            int pixel = cpos;
+    
+            if(dir == CARRIAGE_LEFT) {
+              pixel = cpos - 36 ; // 25
+              shift = 8; 
+              pixel += shift;
+              
+            }else if(dir == CARRIAGE_RIGHT) {
+              pixel = cpos + 13;
+              shift = 8; 
+              pixel += shift;
+            }
+            
+    
+            int start = pixel + ((dir == CARRIAGE_RIGHT) ? -4 : 0);
+            int end = pixel + ((dir == CARRIAGE_LEFT) ? 16 : 0 );
+            
+            if(start < 0) start = 0;
+            if(end > 199) end = 199; 
+            for(; start < end; ++start)
+                m_sol->setState((start+ shift)%NUM_SOLENOIDS, m_currentrow[start]);  
+        }  else {  // BS == SHIFTED
+          
+          int solenoid = 0;
+          int shift = 8;
+          
+          int pixel = cpos;
+  
+          if(dir == CARRIAGE_LEFT) {
+            solenoid = (cpos + shift) % 16;
+            pixel = cpos - 36; // 25
+            
+          }else if(dir == CARRIAGE_RIGHT) {
+            solenoid = (cpos + shift) % 16;
+            pixel = cpos + 13;
+          }
+          
+  
+            pixel = pixel + shift;
+  
+          int start = pixel + ((dir == CARRIAGE_RIGHT) ? -8 : 0);
+          int end = pixel + ((dir == CARRIAGE_LEFT) ? 14 : 0 );
+          
+          if(start < 0) start = 0;
+          if(end > 199) end = 199; 
+          for(; start < end; ++start)
+              m_sol->setState((start)%NUM_SOLENOIDS, m_currentrow[start]);    
         }
-        // Bound the window to a resonable area
-        if(start_pos < 0) start_pos = 0;
-        if(start_pos > NEEDLEBED_COUNT) start_pos = NEEDLEBED_COUNT;
-        if(end_pos < 0) end_pos = 0;
-        if(end_pos > NEEDLEBED_COUNT) end_pos = NEEDLEBED_COUNT;
-
-        // Activate solenoids
-        m_sol->clearSolenoids();
-        
-        for(unsigned int i = start_pos; i < end_pos+1; i++){
-            Serial.print(i); Serial.print(":"), Serial.print(m_currentrow[i]), Serial.print("\n");
-            m_sol->setState(i%NUM_SOLENOIDS, m_currentrow[i]);   
-        }
-        
-        m_sol->writeSolenoids();     
-        Serial.print("Updaing");
+        m_sol->writeSolenoids();  
+           
     }
 
     /*
@@ -73,7 +100,6 @@ public:
      */
     void updateRowData(byte *bed, int start, int end) {
         for(unsigned int i = 0; i < NEEDLEBED_COUNT; i++) {
-            Serial.print(i); Serial.print(":"), Serial.print(m_currentrow[i]), Serial.print("\n");
             m_currentrow[i] = bed[i];
         }
     }
