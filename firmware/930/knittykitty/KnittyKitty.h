@@ -30,6 +30,12 @@ enum kk_state : byte {
     KK_TEST_SOL2,
     KK_TEST_LC,
     KK_CALIBRATE,
+    KK_KNIT,
+    KK_KNIT_L,
+    KK_KNIT_R,
+    KK_KNITLACE,
+    KK_KNITLACE_L,
+    KK_KNITLACE_R
 };
 
 enum kk_opcode : byte {
@@ -39,6 +45,10 @@ enum kk_opcode : byte {
     KK_OP_SOL_TEST1,
     KK_OP_SOL_TEST2,
     KK_OP_LC_TEST,
+    KK_OP_KNIT,
+    KK_OP_LACE,
+    KK_OP_POKE_PIXEL_L,
+    KK_OP_POKE_PIXEL_R,
 };
 
 struct kk_state_pack {

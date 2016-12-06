@@ -88,8 +88,13 @@ class KnittyKittyLL:
         self.upack.read()
         self.ser.write(bytearray([4]))
 
-    def send_pattern(self):
-        pass
+    def knitline(self, start, end, l, r):
+        self.ser.write(bytearray([6] + [50] + [150] + [0xF0]*((400/8)) ))
+        self.ser.read()
+
+    def knitlaceline(self, start, end, l, r):
+        self.ser.write(bytearray([7] + [50] + [150] + [0xF0]*((400/8)) ))
+        self.ser.read()
 
     def send_preamble(self):
         pass
@@ -98,6 +103,9 @@ class KnittyKittyLL:
         self.upack.read()
         self.ser.write(bytearray([1]))
         pass
+        
+    def write(self, data):
+        self.ser.write(data)
 
     def close(self):
         self.ser.close()

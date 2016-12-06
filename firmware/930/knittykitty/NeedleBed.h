@@ -38,58 +38,37 @@ public:
         carriage_direction_t dir = m_enc->getCarriageDirection();
         beltshift_t bs = m_enc->getBeltShift();
 
-        if(bs == REGULAR) {
-          
-            int solenoid = 0;
-            int shift = 0;
+        if(carriage == KNIT_CARRIAGE) {
+            int shift = (bs == SHIFTED) ? 8 : 0;
+            int dir_shift = (dir == CARRIAGE_LEFT) ? 16 : -16;
+            int pixel = cpos + dir_shift;            
             
-            int pixel = cpos;
-    
-            if(dir == CARRIAGE_LEFT) {
-              pixel = cpos - 36 ; // 25
-              shift = 8; 
-              pixel += shift;
-              
-            }else if(dir == CARRIAGE_RIGHT) {
-              pixel = cpos + 13;
-              shift = 8; 
-              pixel += shift;
-            }
-            
-    
-            int start = pixel + ((dir == CARRIAGE_RIGHT) ? -4 : 0);
-            int end = pixel + ((dir == CARRIAGE_LEFT) ? 16 : 0 );
+            int start = pixel - 4;
+            int end = pixel + 4;
             
             if(start < 0) start = 0;
             if(end > 199) end = 199; 
             for(; start < end; ++start)
                 m_sol->setState((start+ shift)%NUM_SOLENOIDS, m_currentrow[start]);  
-        }  else {  // BS == SHIFTED
+
+
+            //////////////////
+        } else if(carriage == LACE_CARRIAGE) {
           
-          int solenoid = 0;
-          int shift = 8;
-          
-          int pixel = cpos;
-  
-          if(dir == CARRIAGE_LEFT) {
-            solenoid = (cpos + shift) % 16;
-            pixel = cpos - 36; // 25
+            int shift = (bs == SHIFTED) ? 8 : 0;
+            int dir_shift = (dir == CARRIAGE_LEFT) ? 6 : -6;
+            int pixel = cpos + dir_shift;       
+
+            shift += (dir == CARRIAGE_LEFT)? 0 : 8;
             
-          }else if(dir == CARRIAGE_RIGHT) {
-            solenoid = (cpos + shift) % 16;
-            pixel = cpos + 13;
-          }
-          
-  
-            pixel = pixel + shift;
-  
-          int start = pixel + ((dir == CARRIAGE_RIGHT) ? -8 : 0);
-          int end = pixel + ((dir == CARRIAGE_LEFT) ? 14 : 0 );
-          
-          if(start < 0) start = 0;
-          if(end > 199) end = 199; 
-          for(; start < end; ++start)
-              m_sol->setState((start)%NUM_SOLENOIDS, m_currentrow[start]);    
+            int start = pixel - 6;
+            int end = pixel + 6;
+
+            if(start < 0) start = 0;
+            if(end > 199) end = 199; 
+            for(; start < end; ++start)
+                m_sol->setState((start+ shift)%NUM_SOLENOIDS, m_currentrow[start]);  
+
         }
         m_sol->writeSolenoids();  
            

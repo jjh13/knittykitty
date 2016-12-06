@@ -25,13 +25,14 @@ Urwid example demonstrating use of the BigText widget.
 
 import sys
 from knittykitty.knittykitty import KnittyKittyLL
+from knittykitty.knitcode import *
 
 import select
 
 #
 serial_tty = sys.argv[1]
 drv = KnittyKittyLL(serial_tty)
-drv.reset()
+#drv.reset()
 
 #
 direction = [
@@ -61,6 +62,12 @@ cstate = [
     "KK_TEST_SOL2",
     "KK_TEST_LC",
     "KK_CALIBRATE",
+    "KK_KNIT",
+    "KK_KNIT_L",
+    "KK_KNIT_R",
+    "KK_KNITLACE",
+    "KK_KNITLACE_L",
+    "KK_KNITLACE_R"
 ]
 ##127
 
@@ -79,7 +86,15 @@ def pollkb():
             return input
     return None
 
-drv.enter_sol_test2()
+#drv.enter_sol_test2()
+
+kc_file = open(sys.argv[2])
+content = kc_file.readlines()
+#print content
+code, warnings, errors = compile_knitcode(''.join(content))
+
+code = list(reversed(code))
+
 while 1:
     u = drv.get_update()
     print_there(0,0, "Carriage position: %d" % (u.carriage_position))
@@ -89,6 +104,7 @@ while 1:
     print_there(5,0, "State: %s" % cstate[u.state]) #[u.carriage_direction])
     print_there(7,0, "Left: %s" % u.eol_left) #[u.carriage_direction])
     print_there(8,0, "Right: %s" % u.eol_right) #[u.carriage_direction])
+
 
     schange = pollkb()
     if schange is None:
@@ -102,9 +118,20 @@ while 1:
     elif schange[0] == "3":
         print "Changing to Sol Test 2"
         drv.enter_sol_test2()
+    elif schange[0] == "4":
+        print "Changing to Sol Test 2"
+        drv.knitline(50, 150, [],[])
+    elif schange[0] == "5":
+        print "Changing to Sol Test 2"
+        drv.knitlaceline(50, 150, [],[])
+
     elif schange[0] == "r":
         print "Resetting "
         drv.reset()
+    elif len(code) > 0 and cstate[u.state] == "KK_IDLE" and schange[0] == 'n':
+            _, k = code.pop()
+            drv.write(k.bytes())
+            print "swapping"
 
 
 

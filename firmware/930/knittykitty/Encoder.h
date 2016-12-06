@@ -68,10 +68,9 @@ public:
             return;
 
         // High to low transition
-        if(previousState == true && state == false) {
+        if(state == false && previousState == true) {
             encoderAFalling();
         } else { // Low to high
-
             encoderARising();
         }
         previousState = state;
@@ -85,26 +84,18 @@ private:
     EndOfLine *m_eol;
     int m_position;
 
-    /* 
-     *  Called when the carriage is moving 
-     *  left to right.
-     */
-    void encoderARising() { // Handle moving right
+    void encoderAFalling() { // handle moving left
         uint16_t eol_value = 0;
 
-        // Check the service manual for this.
-        m_direction = digitalRead(ENCODER_B) ? CARRIAGE_LEFT : CARRIAGE_RIGHT ;
-
-        if(m_direction == CARRIAGE_LEFT) 
+        if(m_direction == CARRIAGE_RIGHT) // Right is handled on rising edge
             return;
 
-        if(m_position > -28) m_position--;
+        // As long as we can decrement, do it.
+        if(m_position  > 0 ) m_position--;
 
-        eol_value = m_eol->readLeft();
-        
-        if(eol_value < m_eol->getLeftMin() || eol_value > m_eol->getLeftMax() ) {
         //
-        //
+        eol_value = m_eol->readRight();
+        if(eol_value < m_eol->getRightMin() || eol_value > m_eol->getRightMax() ) {
 
             // Determine the carriage
             if(eol_value < m_eol->getRightMin()) {
@@ -117,21 +108,26 @@ private:
             m_beltshift = digitalRead(ENCODER_C) ? SHIFTED : REGULAR;
 
             // We're restarting, so reset our position
-            m_position = 199;// + 28;
+            m_position = NEEDLEBED_COUNT-1;
         }
     }
 
-    
-    void encoderAFalling() { // handle moving left
+    void encoderARising() { // Handle moving right
         uint16_t eol_value = 0;
 
-        if(m_direction == CARRIAGE_RIGHT) // Right is handled on rising edge
+        // Check the service manual for this.
+        m_direction = digitalRead(ENCODER_B) ? CARRIAGE_LEFT : CARRIAGE_RIGHT;
+
+        if(m_direction == CARRIAGE_LEFT) // Moving left should be handled on the falling edge
+        {
             return;
+        }
 
-        if(m_position < NEEDLEBED_COUNT+28) m_position++;
+        if(m_position < NEEDLEBED_COUNT) m_position++;
 
-        eol_value = m_eol->readRight();
-        if(eol_value < m_eol->getRightMin() || eol_value > m_eol->getRightMax() ) {
+        //
+        eol_value = m_eol->readLeft();
+        if(eol_value < m_eol->getLeftMin() || eol_value > m_eol->getLeftMax() ) {
 
             // Determine the carriage
             if(eol_value < m_eol->getLeftMin()) {
@@ -144,10 +140,9 @@ private:
             m_beltshift = digitalRead(ENCODER_C) ? REGULAR : SHIFTED;
 
             // We're restarting, so reset our position
-            m_position = 0 ; //NEEDLEBED_COUNT + 28;
+            m_position = 0;
         }
     }
-
 };
 
 #endif //__KNITTY_KITTY_SOLENOID__
