@@ -11,7 +11,7 @@
 
 class KKProtocol {
 public:
-    KKProtocol(EndOfLine *e, Encoders *enc) : m_eol(e), m_enc(enc) {
+    KKProtocol(EndOfLine *e, Encoders *enc, NeedleBed *bed) : m_eol(e), m_enc(enc), m_bed(bed) {
         Serial.begin(115200);
     }
     ~KKProtocol() {
@@ -22,7 +22,7 @@ public:
      * Syncronizes the host with the state of the knitting
      * machine firmware.
      */
-    void sendSync(byte state) {
+    void sendSync(byte state, ClipColumn **cols) {
         kk_state_pack info;
 
         info.header_sig         = KNITTY_KITTY_SIG;
@@ -33,9 +33,12 @@ public:
         info.state              = state;
         info.left_eol_value     = m_eol->readLeft();
         info.right_eol_value    = m_eol->readRight();
-        info.ver_maj            = KNITTY_KITTY_VERSION_MAJ;
+        info.ver_maj            = m_bed->offset; //KNITTY_KITTY_VERSION_MAJ;
         info.ver_min            = KNITTY_KITTY_VERSION_MIN;
 
+        for(int i = 0; i < 7; i++) {
+            info.rows[i] = cols[i]->getBinValue();
+        }
         Serial.write((byte*)&info, sizeof(kk_state_pack));
 
     }
@@ -67,6 +70,10 @@ public:
 
             case KK_OP_RESET:
                 *state = KK_INIT;
+                break;
+
+            case KK_OP_SYNC:
+                *state = KK_SEND_SYNC;
                 break;
 
             case KK_OP_KNIT:
@@ -133,6 +140,14 @@ public:
             default:
                 return false;
 
+            case KK_OP_INC_OFFSET:
+              m_bed->offset += 1;
+              return false;
+            case KK_OP_DEC_OFFSET:
+              m_bed->offset -= 1;
+              return false;
+              break;
+
         }
         return true;
 
@@ -141,6 +156,7 @@ public:
 private:
     EndOfLine *m_eol;
     Encoders *m_enc;
+    NeedleBed *m_bed;
 };
 
 

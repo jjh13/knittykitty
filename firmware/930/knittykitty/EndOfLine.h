@@ -19,16 +19,21 @@ public:
                   m_iLeftMin(FILTER_VALUE_LEFT_MIN), 
                   m_iLeftMax(FILTER_VALUE_LEFT_MAX), 
                   m_iRightMin(FILTER_VALUE_RIGHT_MIN), 
-                  m_iRightMax(FILTER_VALUE_RIGHT_MAX) {
+                  m_iRightMax(FILTER_VALUE_RIGHT_MAX),
+                  m_iLeftCache(0), m_iRightCache(0) {
     }
     ~EndOfLine() { }
 
+    void update() {
+      m_iLeftCache = analogRead(ENDLINE_L);
+      m_iRightCache = analogRead(ENDLINE_R);
+    }
     uint16_t readLeft() {
-        return analogRead(ENDLINE_L);
+        return m_iLeftCache();
     }
 
     uint16_t readRight() {
-        return analogRead(ENDLINE_R);
+        return m_iRightCache();
     }
 
     uint16_t getLeftMin() {
@@ -45,6 +50,7 @@ public:
     }
 
     void calibrateUpdate() {
+        this->update();
         uint16_t left = readLeft();
         uint16_t right = readRight();
 
@@ -56,6 +62,7 @@ public:
 
 private:
     uint16_t m_iLeftMin, m_iLeftMax, m_iRightMin, m_iRightMax;
+    uint16_t m_iLeftCache, m_iRightCache;
     bool m_bCalibrate;
 };
 

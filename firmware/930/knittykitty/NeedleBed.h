@@ -24,6 +24,7 @@ class NeedleBed {
 public:
     NeedleBed(SolenoidArray *s, Encoders *e) : m_sol(s), m_enc(e) {
         clearBed();
+        offset = -22;
     }
 
     ~NeedleBed() { }
@@ -33,43 +34,46 @@ public:
      * from the encoder. This basically actuates the 
      */
     void updateBed() {
+      
         int cpos = m_enc->getCarriagePosition();
         carriage_t carriage = m_enc->getCarriageType();
         carriage_direction_t dir = m_enc->getCarriageDirection();
         beltshift_t bs = m_enc->getBeltShift();
+        int shift = 0, pixel = 0;
 
+        int start = pixel - 6;
+        int end = pixel + 6;
+        
         if(carriage == KNIT_CARRIAGE) {
-            int shift = (bs == SHIFTED) ? 8 : 0;
-            int dir_shift = (dir == CARRIAGE_LEFT) ? 16 : -16;
-            int pixel = cpos + dir_shift;            
-            
-            int start = pixel - 4;
-            int end = pixel + 4;
-            
-            if(start < 0) start = 0;
-            if(end > 199) end = 199; 
-            for(; start < end; ++start)
-                m_sol->setState((start+ shift)%NUM_SOLENOIDS, m_currentrow[start]);  
+            int dir_shift = (dir == CARRIAGE_LEFT) ? offset : -28;
+            pixel = cpos + dir_shift;
+            shift = (bs == SHIFTED) ? 8 : 0;    
 
-
-            //////////////////
+            if(dir == CARRIAGE_LEFT) {
+                start = pixel - 12;
+                end = pixel;    
+            } else {
+                start = pixel;
+                end = pixel + 16;    
+            }
+            
         } else if(carriage == LACE_CARRIAGE) {
           
-            int shift = (bs == SHIFTED) ? 8 : 0;
             int dir_shift = (dir == CARRIAGE_LEFT) ? 6 : -6;
-            int pixel = cpos + dir_shift;       
+            shift = (bs == SHIFTED) ? 8 : 0;
+            pixel = cpos + dir_shift;       
 
             shift += (dir == CARRIAGE_LEFT)? 0 : 8;
-            
-            int start = pixel - 6;
-            int end = pixel + 6;
-
-            if(start < 0) start = 0;
-            if(end > 199) end = 199; 
-            for(; start < end; ++start)
-                m_sol->setState((start+ shift)%NUM_SOLENOIDS, m_currentrow[start]);  
-
+            start = pixel - 6;
+            end = pixel + 6;
         }
+        
+
+        
+        if(start < 0) start = 0;
+        if(end > 199) end = 199; 
+        for(; start < end; ++start)
+            m_sol->setState((start+ shift)%NUM_SOLENOIDS, m_currentrow[start]);  
         m_sol->writeSolenoids();  
            
     }
@@ -94,7 +98,7 @@ public:
         }
         m_sol->writeSolenoids();
     }
-    
+    char offset;
 private:
     Encoders *m_enc;
     SolenoidArray *m_sol;
