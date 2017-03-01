@@ -22,6 +22,10 @@ public:
         pinMode(ENCODER_A, INPUT);
         pinMode(ENCODER_B, INPUT);
         pinMode(ENCODER_C, INPUT);
+
+        tposition = 200;
+        testing = true;
+        goingLeft = true;
     }
     ~Encoders() { }
 
@@ -29,6 +33,7 @@ public:
      *
      */
     carriage_direction_t getCarriageDirection() {
+        if(testing) return goingLeft ? CARRIAGE_LEFT : CARRIAGE_RIGHT;
         return m_direction;
     }
 
@@ -50,7 +55,24 @@ public:
      *
      */
     int getCarriagePosition() {
+       if(testing) 
+           return tposition;
         return m_position;
+    }
+
+    void tUpdate() {
+      if(goingLeft) tposition--;
+      else tposition++;
+
+      if(tposition < 0) {
+        tposition = 0; 
+        goingLeft = false;
+      }
+      if(tposition > 200){
+        tposition = 200;
+        goingLeft = true;
+      }
+      
     }
 
     // This should be called on the transition of
@@ -82,8 +104,10 @@ private:
     beltshift_t m_beltshift;
 
     EndOfLine *m_eol;
-    int m_position;
-
+    int m_position, tposition;
+    bool testing;
+    bool goingLeft;
+    
     void encoderAFalling() { // handle moving left
         uint16_t eol_value = 0;
 

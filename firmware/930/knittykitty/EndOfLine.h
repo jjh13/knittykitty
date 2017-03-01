@@ -29,11 +29,11 @@ public:
       m_iRightCache = analogRead(ENDLINE_R);
     }
     uint16_t readLeft() {
-        return m_iLeftCache();
+        return m_iLeftCache;
     }
 
     uint16_t readRight() {
-        return m_iRightCache();
+        return m_iRightCache;
     }
 
     uint16_t getLeftMin() {

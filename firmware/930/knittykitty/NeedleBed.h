@@ -98,7 +98,13 @@ public:
         }
         m_sol->writeSolenoids();
     }
-    char offset;
+
+    int getAtPosition(int pos) {
+      if(pos >= 200 || pos < 0) return 0;
+      return m_currentrow[pos] ? 1 : 0;
+    }
+    
+    uint32_t offset;
 private:
     Encoders *m_enc;
     SolenoidArray *m_sol;

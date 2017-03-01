@@ -9,7 +9,7 @@
 
 // Versioning 
 #define KNITTY_KITTY_VERSION_MAJ 0
-#define KNITTY_KITTY_VERSION_MIN 1
+#define KNITTY_KITTY_VERSION_MIN 2
 
 // Machine prefs
 #define MACHINE       "930"
@@ -17,6 +17,8 @@
 
 #define NUM_SOLENOIDS   16
 #define NEEDLEBED_COUNT 200
+
+#define N_BUFFERS 2
 
 // Pin mappings
 #define ENCODER_A 2  // This needs to map to an interruptable pin!
@@ -49,9 +51,5 @@
 #define FILTER_VALUE_LEFT_MAX     730
 #define FILTER_VALUE_RIGHT_MAX    730
 
-
-
-// Tuning parameters
-#define LOOKAHEAD 4
 
 #endif //__KNITTY_KITTY_SETTINGS__
